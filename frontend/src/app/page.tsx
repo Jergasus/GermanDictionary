@@ -11,7 +11,7 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = useCallback(async (q: string, lang: string) => {
+  const handleSearch = useCallback(async (q: string) => {
     setQuery(q);
 
     if (!q.trim()) {
@@ -22,7 +22,7 @@ export default function Home() {
 
     setIsLoading(true);
     try {
-      const data = await searchWords(q, lang);
+      const data = await searchWords(q);
       setResults(data.results);
       setSuggestions(data.suggestions);
     } catch (err) {
@@ -36,7 +36,7 @@ export default function Home() {
 
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
-      handleSearch(suggestion, "de");
+      handleSearch(suggestion);
     },
     [handleSearch],
   );
@@ -51,14 +51,14 @@ export default function Home() {
             <span className="text-white/80">buch</span>
           </h1>
           <p className="mt-1.5 sm:mt-2 text-white/30 text-sm sm:text-base">
-            Diccionario Alemán ↔ Español
+            Diccionario Alemán → Español
           </p>
         </div>
       </header>
 
       {/* Search area */}
       <section className="px-4 pb-4 sticky top-0 z-10 bg-gradient-to-b from-slate-950 via-slate-950/95 to-transparent pt-3">
-        <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+        <SearchBar onSearch={handleSearch} />
       </section>
 
       {/* Results */}

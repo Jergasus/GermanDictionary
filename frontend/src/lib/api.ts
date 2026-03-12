@@ -46,10 +46,9 @@ export interface SuggestionResponse {
  */
 export async function searchWords(
   query: string,
-  lang: string = "de",
   limit: number = 20,
 ): Promise<SearchResponse> {
-  const params = new URLSearchParams({ q: query, lang, limit: String(limit) });
+  const params = new URLSearchParams({ q: query, lang: "de", limit: String(limit) });
   const res = await fetch(`${API_BASE}/api/search?${params}`);
   if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
   return res.json();
@@ -60,9 +59,8 @@ export async function searchWords(
  */
 export async function getSuggestions(
   query: string,
-  lang: string = "de",
 ): Promise<SuggestionResponse> {
-  const params = new URLSearchParams({ q: query, lang });
+  const params = new URLSearchParams({ q: query, lang: "de" });
   const res = await fetch(`${API_BASE}/api/suggestions?${params}`);
   if (!res.ok) throw new Error(`Suggestions failed: ${res.statusText}`);
   return res.json();
