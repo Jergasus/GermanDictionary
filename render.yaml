@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: worterbuch-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+    healthCheckPath: /api/health

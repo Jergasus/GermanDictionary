@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* ── Base styles ── */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #020617; /* slate-950 */
+  color: #f8fafc;
+  font-family:
+    var(--font-inter),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* ── Dynamic viewport height fix for mobile browsers ── */
+.min-h-dvh {
+  min-height: 100dvh;
+}
+
+/* ── Safe area utilities for notched devices ── */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Input autofill override ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #0f172a inset;
+  -webkit-text-fill-color: #f8fafc;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(251, 191, 36, 0.3);
+  color: white;
+}
+
+/* ── Smooth animations ── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

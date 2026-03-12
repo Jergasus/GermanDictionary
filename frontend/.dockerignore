@@ -1,0 +1,4 @@
+# Ignore dev/build artifacts
+node_modules
+.next
+npm-debug.log*

@@ -1,0 +1,6 @@
+# Ignore dev/build artifacts
+venv
+__pycache__
+*.pyc
+.env
+data

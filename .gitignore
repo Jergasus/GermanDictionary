@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Data files (too large for git)
+backend/data/
+
+# One-off scripts
+backend/fix_missing_translations.py
+backend/run_inference.py
+
+# OS
+.DS_Store
+Thumbs.db

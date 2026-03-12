@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+motor
+pydantic
+pydantic-settings
+simplemma
+rapidfuzz
+python-dotenv
+pymongo
+certifi
