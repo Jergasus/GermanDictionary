@@ -80,7 +80,7 @@ export default function SearchResults({
               <div
                 key={result.id}
                 className="animate-fade-in"
-                style={{ animationDelay: `${i * 40}ms` }}
+                style={{ animationDelay: `${i * 100}ms` }}
               >
                 <WordCard result={result} />
               </div>
