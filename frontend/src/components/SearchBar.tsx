@@ -102,29 +102,7 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
       {/* Search input */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-          {isLoading ? (
-            <svg
-              className="animate-spin h-5 w-5 text-amber-300/70"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-          ) : (
-            <svg
+          <svg
               className="h-5 w-5 text-white/40"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -138,7 +116,6 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-          )}
         </div>
         <input
           ref={inputRef}

@@ -62,7 +62,7 @@ export default function Home() {
       </section>
 
       {/* Results */}
-      <section className="px-4 pb-20">
+      <section className="px-4 pb-8">
         <SearchResults
           results={results}
           suggestions={suggestions}
@@ -71,13 +71,6 @@ export default function Home() {
           onSuggestionClick={handleSuggestionClick}
         />
       </section>
-
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-3 text-center bg-slate-950/80 backdrop-blur-sm border-t border-white/5 pb-safe">
-        <p className="text-white/20 text-xs">
-          Wörterbuch — Diccionario abierto DE↔ES
-        </p>
-      </footer>
     </main>
   );
 }
