@@ -138,21 +138,6 @@ export default function WordCard({ result }: WordCardProps) {
           </p>
         </div>
       )}
-
-      {/* Match type badge */}
-      {result.match_type !== "exact" && (
-        <div className="mt-3">
-          <span className="text-xs text-white/20 bg-white/5 px-2 py-0.5 rounded-full">
-            {result.match_type === "lemma"
-              ? "Forma base"
-              : result.match_type === "fuzzy"
-                ? "Coincidencia aproximada"
-                : result.match_type === "prefix"
-                  ? "Coincidencia parcial"
-                  : result.match_type}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

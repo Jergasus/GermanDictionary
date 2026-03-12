@@ -18,28 +18,8 @@ export default function SearchResults({
   isLoading,
   onSuggestionClick,
 }: SearchResultsProps) {
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="w-full max-w-2xl mx-auto mt-8">
-        <div className="flex flex-col gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-white/[0.04] border border-white/5 rounded-2xl p-5 animate-pulse"
-            >
-              <div className="h-6 bg-white/10 rounded-lg w-1/3 mb-3" />
-              <div className="h-4 bg-white/5 rounded-lg w-1/2 mb-2" />
-              <div className="h-4 bg-white/5 rounded-lg w-2/3" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   // No query — show nothing
-  if (!query) return null;
+  if (!query && !isLoading) return null;
 
   // No results
   if (results.length === 0 && query) {
