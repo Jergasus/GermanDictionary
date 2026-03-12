@@ -4,6 +4,14 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+/**
+ * Ping backend health endpoint to wake it up (Render cold start).
+ * Fire-and-forget, no error handling needed.
+ */
+export function warmupBackend() {
+  fetch(`${API_BASE}/api/health`).catch(() => {});
+}
+
 export interface Translation {
   text: string;
   target_language: string;

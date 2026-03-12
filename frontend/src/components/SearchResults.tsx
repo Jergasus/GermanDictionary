@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { SearchResult } from "@/lib/api";
 import WordCard from "./WordCard";
 
@@ -19,17 +18,6 @@ export default function SearchResults({
   isLoading,
   onSuggestionClick,
 }: SearchResultsProps) {
-  const [visible, setVisible] = useState(false);
-
-  // Fade in whenever content changes
-  useEffect(() => {
-    setVisible(false);
-    const t = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setVisible(true));
-    });
-    return () => cancelAnimationFrame(t);
-  }, [results, isLoading, query]);
-
   // Nothing to show
   if (!query && !isLoading) return null;
 
@@ -37,21 +25,17 @@ export default function SearchResults({
   const noResults = !isLoading && results.length === 0 && query;
 
   return (
-    <div
-      className="w-full max-w-2xl mx-auto mt-6 transition-all duration-300 ease-out"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(6px)",
-      }}
-    >
+    <div className="w-full max-w-2xl mx-auto mt-6">
       {/* Loading */}
       {isLoading && (
-        <p className="text-white/30 text-sm text-center">Buscando...</p>
+        <p className="text-white/30 text-sm text-center animate-fade-in">
+          Buscando...
+        </p>
       )}
 
       {/* No results */}
       {noResults && (
-        <div className="text-center">
+        <div className="text-center animate-fade-in">
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-8">
             <div className="text-3xl mb-3">🔍</div>
             <p className="text-white/60 text-lg">
@@ -92,8 +76,14 @@ export default function SearchResults({
           </p>
 
           <div className="flex flex-col gap-3">
-            {results.map((result) => (
-              <WordCard key={result.id} result={result} />
+            {results.map((result, i) => (
+              <div
+                key={result.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
+                <WordCard result={result} />
+              </div>
             ))}
           </div>
 

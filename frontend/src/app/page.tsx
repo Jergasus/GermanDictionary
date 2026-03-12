@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import SearchResults from "@/components/SearchResults";
-import { searchWords, SearchResult } from "@/lib/api";
+import { searchWords, SearchResult, warmupBackend } from "@/lib/api";
 
 export default function Home() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Wake up backend on page load (Render cold start)
+  useEffect(() => { warmupBackend(); }, []);
 
   const handleSearch = useCallback(async (q: string) => {
     setQuery(q);
