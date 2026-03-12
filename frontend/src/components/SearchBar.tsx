@@ -104,7 +104,7 @@ export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
         <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
           {isLoading ? (
             <svg
-              className="animate-spin h-5 w-5 text-white/40"
+              className="animate-spin h-5 w-5 text-amber-300/70"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
