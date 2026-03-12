@@ -21,6 +21,15 @@ export default function SearchResults({
   // No query — show nothing
   if (!query && !isLoading) return null;
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-2xl mx-auto mt-8 text-center animate-fade-in">
+        <p className="text-white/30 text-sm">Buscando...</p>
+      </div>
+    );
+  }
+
   // No results
   if (results.length === 0 && query) {
     return (
@@ -60,7 +69,7 @@ export default function SearchResults({
 
   // Results list
   return (
-    <div className="w-full max-w-2xl mx-auto mt-6">
+    <div className="w-full max-w-2xl mx-auto mt-6 animate-fade-in">
       <p className="text-white/30 text-sm mb-4">
         {results.length} {results.length === 1 ? "resultado" : "resultados"}
       </p>
