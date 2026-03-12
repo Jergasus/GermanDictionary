@@ -106,19 +106,12 @@ export default function WordCard({ result }: WordCardProps) {
         </button>
       </div>
 
-      {/* POS + IPA pronunciation */}
-      <div className="mt-1.5 flex items-center gap-3 flex-wrap">
-        {posLabel && (
-          <span className="text-xs text-white/30 font-medium tracking-wide uppercase">
-            {posLabel}
-          </span>
-        )}
-        {result.pronunciation && (
-          <span className="text-xs text-white/40 font-mono">
-            {result.pronunciation}
-          </span>
-        )}
-      </div>
+      {/* POS label */}
+      {posLabel && (
+        <span className="mt-0.5 text-xs text-white/30 font-medium tracking-wide uppercase block">
+          {posLabel}
+        </span>
+      )}
 
       {/* Translations */}
       <div className="mt-3 flex flex-wrap gap-2">
