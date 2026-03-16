@@ -248,6 +248,16 @@ def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
             ]
             examples = filtered_examples
 
+    # Deduplicate examples by source_sentence
+    seen_src: set[str] = set()
+    unique_examples = []
+    for e in examples:
+        src = e.get("source_sentence", "")
+        if src not in seen_src:
+            seen_src.add(src)
+            unique_examples.append(e)
+    examples = unique_examples
+
     return SearchResult(
         id=str(doc["_id"]),
         lemma=doc.get("lemma", ""),
