@@ -223,32 +223,33 @@ async def _fuzzy_suggestions(query: str, lang: str, limit: int = 5) -> list[str]
     return [match[0] for match in matches]
 
 
+def _noun_example_pattern(doc: dict) -> "re.Pattern | None":
+    """Build a regex that matches any noun form of the entry (case-sensitive)."""
+    forms = {doc.get("lemma", "").strip()}
+    if doc.get("plural_form"):
+        forms.add(doc["plural_form"].strip())
+    for af in doc.get("alternative_forms", []):
+        ft = (af.get("form_text") or "").strip()
+        if ft:
+            forms.add(ft)
+    forms = {f for f in forms if f}
+    if not forms:
+        return None
+    return re.compile(r"\b(?:" + "|".join(re.escape(f) for f in forms) + r")\b")
+
+
 def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
     """Convert a MongoDB document to a SearchResult."""
     examples = doc.get("examples", [])
 
-    # For nouns, keep only examples that contain the noun form with matching case.
-    # This avoids showing verb-context examples for capitalized noun lemmas (e.g. Lese vs lesen).
+    # For nouns, keep only examples that actually contain a noun form (respects capitalisation).
+    # This prevents verb-context sentences leaking into noun cards (e.g. Lese vs lesen).
     if doc.get("part_of_speech") == "noun" and examples:
-        noun_forms = {doc.get("lemma", "").strip()}
-        plural_form = (doc.get("plural_form") or "").strip()
-        if plural_form:
-            noun_forms.add(plural_form)
-        for af in doc.get("alternative_forms", []):
-            form_text = (af.get("form_text") or "").strip()
-            if form_text:
-                noun_forms.add(form_text)
+        pattern = _noun_example_pattern(doc)
+        if pattern:
+            examples = [e for e in examples if pattern.search(e.get("source_sentence", ""))]
 
-        noun_forms = {f for f in noun_forms if f}
-        if noun_forms:
-            pattern = re.compile(r"\\b(?:" + "|".join(re.escape(f) for f in noun_forms) + r")\\b")
-            filtered_examples = [
-                e for e in examples
-                if pattern.search(e.get("source_sentence", ""))
-            ]
-            examples = filtered_examples
-
-    # Deduplicate examples by source_sentence
+    # Deduplicate by source sentence, then keep only the best (shortest, most natural) one.
     seen_src: set[str] = set()
     unique_examples = []
     for e in examples:
@@ -256,7 +257,9 @@ def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
         if src not in seen_src:
             seen_src.add(src)
             unique_examples.append(e)
-    examples = unique_examples
+
+    # Return at most 1 example
+    best = sorted(unique_examples, key=lambda e: len(e.get("source_sentence", "")))[:1]
 
     return SearchResult(
         id=str(doc["_id"]),
@@ -269,8 +272,6 @@ def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
         translations=[
             Translation(**t) for t in doc.get("translations", [])
         ],
-        examples=[
-            Example(**e) for e in examples
-        ],
+        examples=[Example(**e) for e in best],
         match_type=match_type,
     )
