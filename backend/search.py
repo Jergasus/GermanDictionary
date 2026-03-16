@@ -225,6 +225,29 @@ async def _fuzzy_suggestions(query: str, lang: str, limit: int = 5) -> list[str]
 
 def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
     """Convert a MongoDB document to a SearchResult."""
+    examples = doc.get("examples", [])
+
+    # For nouns, keep only examples that contain the noun form with matching case.
+    # This avoids showing verb-context examples for capitalized noun lemmas (e.g. Lese vs lesen).
+    if doc.get("part_of_speech") == "noun" and examples:
+        noun_forms = {doc.get("lemma", "").strip()}
+        plural_form = (doc.get("plural_form") or "").strip()
+        if plural_form:
+            noun_forms.add(plural_form)
+        for af in doc.get("alternative_forms", []):
+            form_text = (af.get("form_text") or "").strip()
+            if form_text:
+                noun_forms.add(form_text)
+
+        noun_forms = {f for f in noun_forms if f}
+        if noun_forms:
+            pattern = re.compile(r"\\b(?:" + "|".join(re.escape(f) for f in noun_forms) + r")\\b")
+            filtered_examples = [
+                e for e in examples
+                if pattern.search(e.get("source_sentence", ""))
+            ]
+            examples = filtered_examples
+
     return SearchResult(
         id=str(doc["_id"]),
         lemma=doc.get("lemma", ""),
@@ -237,7 +260,7 @@ def _doc_to_result(doc: dict, match_type: str) -> SearchResult:
             Translation(**t) for t in doc.get("translations", [])
         ],
         examples=[
-            Example(**e) for e in doc.get("examples", [])
+            Example(**e) for e in examples
         ],
         match_type=match_type,
     )

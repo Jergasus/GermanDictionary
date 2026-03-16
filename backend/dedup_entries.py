@@ -116,10 +116,19 @@ async def run_dedup(dry_run: bool = False):
     for lang in ["de", "es"]:
         print(f"\n🔄 Deduplicating {lang.upper()} entries...")
 
-        # Find duplicate lemmas
+        # Find duplicate entries by lemma + POS to avoid merging different grammatical categories
         pipeline = [
             {"$match": {"language": lang}},
-            {"$group": {"_id": "$lemma", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+            {
+                "$group": {
+                    "_id": {
+                        "lemma": "$lemma",
+                        "part_of_speech": "$part_of_speech",
+                    },
+                    "count": {"$sum": 1},
+                    "ids": {"$push": "$_id"},
+                }
+            },
             {"$match": {"count": {"$gt": 1}}},
         ]
 

@@ -86,26 +86,6 @@ export default function SearchResults({
               </div>
             ))}
           </div>
-
-          {suggestions.length > 0 && results.length < 3 && (
-            <div className="mt-6 text-center">
-              <p className="text-white/30 text-sm mb-3">Búsquedas relacionadas</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {suggestions.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => onSuggestionClick(s)}
-                    className="px-4 py-2 min-h-[44px] rounded-lg text-sm
-                               bg-white/5 border border-white/10 text-white/50
-                               hover:bg-white/10 hover:text-white/70
-                               active:bg-white/15 transition-all duration-200"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>
