@@ -63,15 +63,20 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
     1. Exact match on lemma
     2. Match on alternative_forms
     3. Lemmatized search
-    4. Fuzzy matching
+    4. Match on Spanish translations (secondary stage)
+    5. Prefix match on lemma
+    6. Fuzzy matching
     """
     db = get_db()
     words_col = db.words
     query_clean = query.strip().lower()
     normalized = normalize_query(query)
 
+    # Dictionary is DE→ES only now: always search German entries.
+    search_lang = "de"
+
     # Get lemma candidates
-    lemma_candidates = lemmatize(query_clean, lang)
+    lemma_candidates = lemmatize(query_clean, search_lang)
 
     # Expand umlaut variants
     umlaut_variants = expand_umlaut_query(query_clean)
@@ -82,7 +87,7 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
 
     # 1. Exact match on lemma
     exact_query = {
-        "language": lang,
+        "language": search_lang,
         "$or": [
             {"lemma": {"$regex": f"^{re.escape(query_clean)}$", "$options": "i"}},
             {"normalized_form": {"$regex": f"^{re.escape(normalized)}$", "$options": "i"}},
@@ -97,7 +102,7 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
     # 2. Match on alternative_forms
     if len(results) < limit:
         alt_query = {
-            "language": lang,
+            "language": search_lang,
             "alternative_forms.form_text": {"$regex": f"^{re.escape(query_clean)}$", "$options": "i"}
         }
         async for doc in words_col.find(alt_query).limit(limit - len(results)):
@@ -112,7 +117,7 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
             if candidate == query_clean:
                 continue
             lemma_query = {
-                "language": lang,
+                "language": search_lang,
                 "$or": [
                     {"lemma": {"$regex": f"^{re.escape(candidate)}$", "$options": "i"}},
                     {"normalized_form": {"$regex": f"^{re.escape(candidate)}$", "$options": "i"}},
@@ -125,10 +130,51 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
                     seen_ids.add(doc_id)
                     results.append(_doc_to_result(doc, "lemma"))
 
-    # 4. Prefix match for partial input
+    # 4. Secondary stage: match Spanish translations and return German entries.
+    if len(results) < limit:
+        translation_queries = [
+            {
+                "language": search_lang,
+                "translations": {
+                    "$elemMatch": {
+                        "target_language": "es",
+                        "text": {"$regex": f"^{re.escape(query_clean)}$", "$options": "i"},
+                    }
+                },
+            },
+            {
+                "language": search_lang,
+                "translations": {
+                    "$elemMatch": {
+                        "target_language": "es",
+                        "text": {"$regex": f"^{re.escape(query_clean)}", "$options": "i"},
+                    }
+                },
+            },
+            {
+                "language": search_lang,
+                "translations": {
+                    "$elemMatch": {
+                        "target_language": "es",
+                        "text": {"$regex": rf"\\b{re.escape(query_clean)}\\b", "$options": "i"},
+                    }
+                },
+            },
+        ]
+
+        for tq in translation_queries:
+            if len(results) >= limit:
+                break
+            async for doc in words_col.find(tq).limit(limit - len(results)):
+                doc_id = str(doc["_id"])
+                if doc_id not in seen_ids:
+                    seen_ids.add(doc_id)
+                    results.append(_doc_to_result(doc, "translation"))
+
+    # 5. Prefix match for partial input
     if len(results) < limit:
         prefix_query = {
-            "language": lang,
+            "language": search_lang,
             "lemma": {"$regex": f"^{re.escape(query_clean)}", "$options": "i"}
         }
         async for doc in words_col.find(prefix_query).limit(limit - len(results)):
@@ -140,11 +186,11 @@ async def search_words(query: str, lang: str = "de", limit: int = 20) -> dict:
     # 5. Fuzzy matching if still few results
     suggestions = []
     if len(results) < 3:
-        suggestions = await _fuzzy_suggestions(query_clean, lang, limit=5)
+        suggestions = await _fuzzy_suggestions(query_clean, search_lang, limit=5)
 
     return {
         "query": query,
-        "language": lang,
+        "language": search_lang,
         "results": results[:limit],
         "total": len(results),
         "suggestions": suggestions,
